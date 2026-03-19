@@ -64,4 +64,17 @@ with st.sidebar.expander('Quantidade de parcelas'):
     qtd_parcelas = st.slider(
         'Selecione a quantidade de parcelas', 1, 24, (1, 24))
 
-st.dataframe(dados)
+# Filtros
+query = '''
+    Produto in @produtos and \
+    @preco[0] <= Preço <= @preco[1] and \
+    @data_compra[0] <= `Data da Compra` <= @data_compra[1]
+'''
+dados_filtrados = dados.query(query)
+dados_filtrados = dados_filtrados[colunas]
+
+
+st.dataframe(dados_filtrados)
+
+st.markdown(
+    f'A tabela possui :blue[{dados_filtrados.shape[0]}] linhas e :blue[{dados_filtrados.shape[1]}] colunas.')
