@@ -17,13 +17,32 @@ def formata_numero(valor, prefixo=''):
 st.title('DASHBOARD DE VENDAS :shopping_cart:')
 
 url = 'https://labdados.com/produtos'
-response = requests.get(url)
-dados = pd.DataFrame.from_dict(response.json())
 
+regiões = ['Brasil', 'Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul']
+
+st.sidebar.title('Filtros')
+regiao = st.sidebar.selectbox('Região', regiões)
+if regiao == 'Brasil':
+    regiao = ''
+
+todos_anos = st.sidebar.checkbox('Dados de todo o período', value=True)
+if todos_anos:
+    ano = ''
+else:
+    ano = st.sidebar.slider('Ano', 2020, 2023)
+
+query_string = {'regiao': regiao.lower(), }
+response = requests.get(url, params=query_string)
+
+dados = pd.DataFrame.from_dict(response.json())
 dados['Data da Compra'] = pd.to_datetime(
     dados['Data da Compra'], format='%d/%m/%Y')
 
-
+filtro_vendedores = st.sidebar.multiselect(
+    'Vendedores', options=dados['Vendedor'].unique())
+if filtro_vendedores:
+    dados = dados[dados['Vendedor'].isin(filtro_vendedores)]
+    
 # Tabelas
 # Tabelas de receita
 receita_estados = dados.groupby('Local da compra')[['Preço']].sum()
