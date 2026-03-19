@@ -15,6 +15,14 @@ def mensagem_sucesso():
     sucesso.empty()
 
 
+def limpar_filtros():
+    chaves = ['produtos', 'categoria', 'preco', 'frete', 'data_compra',
+              'vendedores', 'local_compra', 'avaliacao', 'tipo_pagamento', 'qtd_parcelas']
+    for chave in chaves:
+        if chave in st.session_state:
+            del st.session_state[chave]
+
+
 st.title('DADOS BRUTOS')
 
 url = 'https://labdados.com/produtos'
@@ -29,34 +37,36 @@ with st.expander('Colunas'):
         dados.columns), list(dados.columns))
 
 st.sidebar.title('Filtros')
+st.sidebar.button('Limpar filtros', on_click=limpar_filtros)
 with st.sidebar.expander('Nome do produto'):
     produtos = st.multiselect(
-        'Selecione os produtos', dados['Produto'].unique(), dados['Produto'].unique())
+        'Selecione os produtos', dados['Produto'].unique(), dados['Produto'].unique(), key='produtos')
 with st.sidebar.expander('Categoria do produto'):
     categoria = st.multiselect('Selecione as categorias', dados['Categoria do Produto'].unique(
-    ), dados['Categoria do Produto'].unique())
+    ), dados['Categoria do Produto'].unique(), key='categoria')
 with st.sidebar.expander('Preço do produto'):
-    preco = st.slider('Selecione o preço', 0, 5000, (0, 5000))
+    preco = st.slider('Selecione o preço', 0, 5000, (0, 5000), key='preco')
 with st.sidebar.expander('Frete da venda'):
-    frete = st.slider('Frete', 0, 250, (0, 250))
+    frete = st.slider('Frete', 0, 250, (0, 250), key='frete')
 with st.sidebar.expander('Data da compra'):
     data_compra = st.date_input(
-        'Selecione a data', (dados['Data da Compra'].min(), dados['Data da Compra'].max()))
+        'Selecione a data', (dados['Data da Compra'].min(), dados['Data da Compra'].max()), key='data_compra')
 with st.sidebar.expander('Vendedor'):
     vendedores = st.multiselect(
-        'Selecione os vendedores', dados['Vendedor'].unique(), dados['Vendedor'].unique())
+        'Selecione os vendedores', dados['Vendedor'].unique(), dados['Vendedor'].unique(), key='vendedores')
 with st.sidebar.expander('Local da compra'):
     local_compra = st.multiselect('Selecione o local da compra', dados['Local da compra'].unique(
-    ), dados['Local da compra'].unique())
+    ), dados['Local da compra'].unique(), key='local_compra')
 with st.sidebar.expander('Avaliação da compra'):
     avaliacao = st.slider(
-        'Selecione a avaliação da compra', 1, 5, value=(1, 5))
+        'Selecione a avaliação da compra', 1, 5, value=(1, 5), key='avaliacao')
 with st.sidebar.expander('Tipo de pagamento'):
     tipo_pagamento = st.multiselect('Selecione o tipo de pagamento', dados['Tipo de pagamento'].unique(
-    ), dados['Tipo de pagamento'].unique())
+    ), dados['Tipo de pagamento'].unique(), key='tipo_pagamento')
 with st.sidebar.expander('Quantidade de parcelas'):
     qtd_parcelas = st.slider(
-        'Selecione a quantidade de parcelas', 1, 24, (1, 24))
+        'Selecione a quantidade de parcelas', 1, 24, (1, 24), key='qtd_parcelas')
+
 
 query = '''
 Produto in @produtos and \
